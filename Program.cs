@@ -11,7 +11,7 @@ namespace ODESolver
         static double b(double lambda, double t)
         {
             //return lambda*lambda*lambda + t;
-            return 1;
+            return 0.25;
         }
 
         static double dBLambda(double lambda, double t)
@@ -29,18 +29,18 @@ namespace ODESolver
         static double a(double lambda, double t)
         {
             //return lambda*lambda + t;
-            return -1.1 * lambda;
+            return 2 * lambda;
         }
 
         static double dALambda(double lambda, double t)
         {
             //return 2*lambda;
-            return -1.1;
+            return 2;
         }
 
         static double alpha(double labmda, double t, double h, double l)
         {
-            return l / (2.0 * h * h) * b(labmda, t) + l / (2.0 * h) * ((1 / 2.0) * d2BLambda(labmda, t) - a(labmda, t));
+            return l / (2.0 * h * h) * b(labmda, t) + l / (2.0 * h) * (dBLambda(labmda, t) - a(labmda, t));
         }
 
         static double gamma(double labmda, double t, double h, double l)
@@ -50,13 +50,12 @@ namespace ODESolver
 
         static double delta(double labmda, double t, double h, double l)
         {
-            return 1 + l / (2.0 * h * h) * b(labmda, t) - l * ((1 / 2.0) * d2BLambda(labmda, t) - dALambda(labmda, t));
+            return 1 + l / (h * h) * b(labmda, t) - l * ((1 / 2.0) * d2BLambda(labmda, t) - dALambda(labmda, t));
         }
 
         static double beta(double labmda, double t, double h, double l)
         {
-            return 1 - l / (2.0 * h * h) * b(labmda, t) +
-                   l * ((1 / 2.0) * d2BLambda(labmda, t) - dALambda(labmda, t));
+            return 1 - l / (h * h) * b(labmda, t) + l * ((1 / 2.0) * d2BLambda(labmda, t) - dALambda(labmda, t));
         }
 
         static bool checkTridiagonalMatrixAlgorithmStability(double A, double B, double C, double E)
@@ -71,11 +70,11 @@ namespace ODESolver
 
         static void Main(string[] args)
         {
-            double c = -2.5;
-            double d = 2.5;
+            double c = 0;
+            double d = 2.2;
 
-            int N = 20;
-            int M = 100;
+            int N = 220;
+            int M = 10000;
             List<List<double>> grid = new List<List<double>>();
 
             for (int i = 0; i < M; i++)
@@ -91,7 +90,7 @@ namespace ODESolver
             }
             
             double h = (d - c) / N;
-            double l = 0.01;
+            double l = 0.0001;
             
             ////initial distribution P(x) normal
             //double mx = (c + d) / 2;
@@ -104,8 +103,8 @@ namespace ODESolver
             //}
 
             //initial delta distibution
-            double initialX = 0.5;
-            int n = 145;
+            double initialX = 1;
+            int n = 140;
             for (int i = 1; i < grid[0].Count - 1; i++)
             {
                 grid[0][i] = n / Math.Sqrt(Math.PI) *
@@ -113,16 +112,16 @@ namespace ODESolver
             }
 
             //normalization
-            double sum = 0;
-            for (int i = 0; i < grid[0].Count; i++)
-            {
-                sum += grid[0][i];
-            }
+            //double sum = 0;
+            //for (int i = 0; i < grid[0].Count; i++)
+            //{
+            //    sum += grid[0][i];
+            //}
 
-            for (int i = 0; i < grid[0].Count; i++)
-            {
-                grid[0][i] /= sum;
-            }
+            //for (int i = 0; i < grid[0].Count; i++)
+            //{
+            //    grid[0][i] /= sum;
+            //}
 
             ExplicitMethod(N, M, c, h, l, grid);
             
